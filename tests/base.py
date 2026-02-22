@@ -93,8 +93,27 @@ class TestBaseClass:
         from oelint_adv.__main__ import create_argparser
         return create_argparser()
 
+    def _validate_rule_id(self, args, id_):
+        import json
+        from oelint_adv.cls_rule import load_rules
+        from oelint_adv.tweaks import Tweaks
+
+        if 'rules.json' not in getattr(self, '__created_files', {}):
+            known_rules = set()
+            for rule in load_rules(args, add_rules=args.addrules):
+                if id_.startswith(rule.ID):
+                    known_rules.add(rule.ID)
+
+            if args.release != Tweaks.DEFAULT_RELEASE:
+                known_rules.add(id_)
+
+            assert known_rules, f"'{id_}' matches at least one base rule ID"
+
     def check_for_id(self, args, id_, occurrences):
         from oelint_adv.__main__ import run
+
+        self._validate_rule_id(args, id_)
+
         _issues, _ = run(args)
         issues = [x[1] for x in _issues]
         _files = '\n---\n'.join(['{k}:\n{v}'.format(k=k, v=v)
