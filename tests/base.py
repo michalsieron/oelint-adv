@@ -99,15 +99,16 @@ class TestBaseClass:
         from oelint_adv.tweaks import Tweaks
 
         if 'rules.json' not in getattr(self, '__created_files', {}):
-            known_rules = set()
+            rule_file = {}
             for rule in load_rules(args, add_rules=args.addrules):
                 if id_.startswith(rule.ID):
-                    known_rules.add(rule.ID)
+                    rule_file[rule.ID] = ""
 
             if args.release != Tweaks.DEFAULT_RELEASE:
-                known_rules.add(id_)
+                rule_file[id_] = ""
 
-            assert known_rules, f"'{id_}' matches at least one base rule ID"
+            assert rule_file, f"'{id_}' matches at least one base rule ID"
+            _rule_file = self._create_tempfile('rules.json', json.dumps(rule_file))
 
     def check_for_id(self, args, id_, occurrences):
         from oelint_adv.__main__ import run

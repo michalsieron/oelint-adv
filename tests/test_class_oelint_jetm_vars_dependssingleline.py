@@ -140,7 +140,9 @@ class TestClassOelintJetmDependsSingleLine(TestBaseClass):
                              ],
                              )
     def test_good_module_off(self, input_, id_, occurrence):
-        self.check_for_id(self._create_args(input_), id_, occurrence)
+        import json
+        _rule_file = self._create_tempfile('rules.json', json.dumps({id_: ""}))
+        self.check_for_id(self._create_args(input_, ['--rulefile=' + _rule_file]), id_, occurrence)
 
     @pytest.mark.parametrize('id_', ['oelint.jetm.vars.dependssingleline'])
     @pytest.mark.parametrize('occurrence', [0])
